@@ -1,0 +1,21 @@
+gene_id,gene_name,gene_description,genus,species,strain_id,novel,triclosan_tolerance,ampicillin_tolerance,tetracycline_tolerance,community_A,community_B
+sp|Q9HZP8|FABV_PSEAE,fabV , Enoyl-[acyl-carrier-protein] reductase [NADH] ,pseudomonas,aeruginosa,strain_01,0,128,128,16,1,0
+sp|Q9KRA3|FABV1_VIBCH,fabV , Enoyl-[acyl-carrier-protein] reductase [NADH],vibrio,cholerae,strain_02,0,128,128,8,1,0
+sp|Q2P9J6|FABV_XANOM,fabV , Enoyl-[acyl-carrier-protein] reductase [NADH] ,xanthomonas,oryzae,strain_03,0,128,2,4,1,0
+sp|Q73Q47|FABV_TREDE,fabV , Trans-2-enoyl-CoA reductase [NADH] ,treponema,denticola,strain_04,0,128,2,2,1,0
+sp|Q62L02|FABV_BURMA,fabV , Enoyl-[acyl-carrier-protein] reductase [NADH] ,burkholderia,mallei,strain_05,0,128,2,4,1,0
+sp|P0AEK4|FABI_ECOLI,fabI , Enoyl-[acyl-carrier-protein] reductase [NADH],escherichia,coli,strain_06,0,2,4,8,1,0
+sp|P54616|FABI_BACSU,fabI , Enoyl-[acyl-carrier-protein] reductase [NADH],bacillus,subtilis,strain_07,0,4,16,64,0,1
+sp|Q81GI3|FABI_BACCR,fabI , Enoyl-[acyl-carrier-protein] reductase [NADH],bacillus,cereus,strain_08,0,2,16,128,0,1
+sp|Q6GI75|FABI_STAAR,fabI , Enoyl-[acyl-carrier-protein] reductase [NADPH],staphylococcus,aureus,strain_09,0,2,64,8,0,1
+sp|O24990|FABI_HELPY,fabI , Enoyl-[acyl-carrier-protein] reductase [NADH],helicobacter,pylori,strain_10,0,4,64,4,0,1
+tr|A0A0M3G239|A0A0M3G239_HAEHA,fabK, Enoyl-[acyl-carrier-protein] reductase [NADH] ,haemophilus,haemolyticus,strain_11,0,64,64,2,1,0
+tr|E6KYQ2|E6KYQ2_9PAST,fabK, Enoyl-[acyl-carrier-protein] reductase [NADH] ,aggregatibacter,segnis,strain_12,0,64,16,4,1,0
+tr|A0A4Y9GUQ1|A0A4Y9GUQ1_9PAST,fabK, Enoyl-[acyl-carrier-protein] reductase [NADH] ,pasteurella,sp.,strain_13,0,64,16,8,1,0
+tr|A0A1R0ED53|A0A1R0ED53_HAEPA,fabK, Enoyl-[acyl-carrier-protein] reductase [NADH] ,haemophilus,parainfluenzae,strain_14,0,64,2,8,1,0
+tr|B0BP34|B0BP34_ACTPJ,fabK, Enoyl-[acyl-carrier-protein] reductase [NADH] ,actinobacillus,pleuropneumoniae,strain_15,0,64,4,4,1,0
+sp|P24182|ACCC_ECOLI,fabG, Biotin carboxylase ,escherichia,coli,strain_16,1,128,8,2,1,0
+sp|P9WGT3|MABA_MYCTU,fabG, Enoyl-[acyl-carrier-protein] reductase [NADH] ,mycobacterium,tuberculosis,strain_17,0,4,128,2,0,1
+sp|I6Y778|FABG4_MYCTU,fabG, Enoyl-[acyl-carrier-protein] reductase [NADH] ,mycobacterium,tuberculosis,strain_18,0,2,128,16,0,1
+sp|P0AEK2|FABG_ECOLI,fabG, Enoyl-[acyl-carrier-protein] reductase [NADH] ,escherichia,coli,strain_19,0,2,64,128,0,1
+sp|P71534|MABA_MYCS2,fabG, Enoyl-[acyl-carrier-protein] reductase [NADH] ,mycolicibacterium,smegmatis,strain_20,0,4,64,4,0,1

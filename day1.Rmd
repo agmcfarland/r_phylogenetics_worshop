@@ -1,0 +1,556 @@
+---
+title: "Day1"
+author: "Alex McFarland"
+date: "8/11/2021"
+output: html_document
+---
+
+```{r setup}
+
+#install.packages('ggtree')
+#install.packages('ggplot2')
+#install.packages('dplyr')
+
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(treeio)
+library(phytools)
+library(ape)
+library(ggpubr)
+
+setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop')
+
+```
+
+# Day 1:  100% of what you need to know to make basic trees in R
+
+- Section 1: Reading in different phylogenetic tree file types
+- Section 2: Basic tree plotting with ggtree
+
+
+We will learn about reading and plotting trees using a set of 20 genes that belong to four different classes of enoyl reductases (five per class) that are involved in fatty acid synthesis. These are fabK, fabG, fabV, and fabI. 
+
+For your own interpretation, know that FabV, FabK, and FabI have the same enzymatic function, but fabG does not. Despite the overlap in function, fabG and FabI are more closely related to each other by sequence. FabV is the next most closely related, and fabK is the least related.
+
+## Section 1:  Reading in different phylogenetic tree file types
+
+There are a variety of different phylogenetic tree file types. One of the most popular ones is the `.newick` (also abbreviated `.nwk`)
+
+We can read in the file using `ape`'s `read.newick()` function.
+
+
+```{r}
+
+tree_nwk <- ape::read.tree('raw_enoyl_seqs.nwk')
+
+```
+
+`tree_nwk` is of `class` '`phylo`'. When can always confirm this by using the `class()` function.
+
+```{r}
+
+class(tree_nwk)
+
+```
+
+We can access the information about the tree object
+
+```{r}
+
+# general info
+tree_nwk
+#  tip label names
+tree_nwk$tip.label
+
+```
+
+
+The `ggtree` package makes it very easy to quickly read in a .`newick` file and view a nicely formatted phylogenetic tree. 
+
+```{r}
+
+tree_nwk <- ape::read.tree('raw_enoyl_seqs.nwk')
+ggtree(tree_nwk)+ # read in tree
+  geom_tiplab()+ # show tip labels
+  geom_treescale(5) # recenter the tree
+
+```
+
+
+Not all phylogenetic tree files can be read with read with `ape::read.tree()`. The `treeio` [package can open virtually all other existing tree file types.](https://yulab-smu.top/treedata-book/chapter1.html#getting-tree-data-with-treeio). Click on the provided link see their commands.
+
+
+## Section 2: Basic tree plotting with ggtree
+
+
+Another common tree filetype are those produced by the program `RAxML`. These are a modified `newick` file that contains bootstrap numbers at each node.
+
+We will use the `ape::read.tree()` to open a `raxml` file in R.
+
+---
+
+### Exercise 1
+
+1.  Use `ape::read.tree()` to read in the file `raw_enoyl_seqs.nwk` and assign it to the variable `my_nwk`
+
+```{r eval=FALSE, include=FALSE}
+
+my_nwk <- ___::___.tree('___')
+
+```
+
+
+2. Display the `my_nwk` tree using `ggtree()`
+
+```{r eval=FALSE, include=FALSE}
+
+ggtree(___)
+
+```
+
+3. Show the `geom_tiplab()` for each leaf in the `ggtree()` visualization of `my_nwk`
+
+```{r eval=FALSE, include=FALSE}
+
+ggtree(___)+
+  ___()
+
+```
+
+
+4. Modify the code from part 3 so that the x-axis is rescaled at `x=7` using `geom_treescale()`
+
+```{r eval=FALSE, include=FALSE}
+
+ggtree(my_nwk)+
+  geom_tiplab()+ # show tip labels
+  geom_treescale(x=7) # recenter the tree
+  
+```
+
+---
+
+Some file types hold additional information. For example, the RAxML tree files can contain bootstrap values at each node bifurcation.
+
+```{r}
+tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+class(tree_raxml)
+
+# for a RAxML file, the bootstrap values are stored under the node.label 
+tree_raxml$node.label
+
+```
+
+The bootstrap values can be displayed "out of the box" on the tree using the option `geom_nodelabaes(label=label)`
+
+```{r}
+
+ggtree(tree_raxml)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+ #show bootstraps
+  geom_treescale(x=5)
+
+```
+
+Oftentimes we want to re-order the tree according to a phylogenetic rooting. 
+
+The `phytools` package provides a `midpoint.root()`ing function for re-ordering the tip labels so that the root is at the two longest branchest.
+
+
+```{r}
+
+tree_raxml_midpointroot <- phytools::midpoint.root(tree_raxml)
+
+```
+
+We can compare the order of the original tree vs the midpoint by accessing data stored in the tree object
+
+
+```{r}
+
+compare_tips <- data.frame('original'=tree_raxml$tip.label, 
+                           'midpoint'=tree_raxml_midpointroot$tip.label)
+
+compare_tips
+```
+
+We can also compare them by plotting both trees side by side
+
+```{r}
+# tree 1
+
+tree_original_visual <- ggtree(tree_raxml)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+
+  geom_treescale(x=10)
+  
+
+tree_midpoint_visual <- ggtree(tree_raxml_midpointroot)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+
+  geom_treescale(x=10)
+  
+
+ggpubr::ggarrange(tree_original_visual, tree_midpoint_visual, nrow=1)
+
+```
+
+The tree on the right is far easier to understand. The different gene types almost cluster together in monophyletic branches. 
+
+Another option to re-organize the tree is to root the tree to an ancestral gene or to an outlier.
+
+We will try this by using `ape::root()` on the gene `sp|P24182|ACCC_ECOLI` and `tr|E6KYQ2|E6KYQ2_9PAST`
+
+```{r}
+
+# first outgroup tree
+tree_raxml_outgrouproot <- ape::root(tree_raxml ,outgroup='sp|P24182|ACCC_ECOLI')
+
+tree_outgroup_visual <- ggtree(tree_raxml_outgrouproot)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+
+  geom_treescale(x=10)
+
+
+# second outgroup tree
+tree_raxml_outgrouproot2 <- ape::root(tree_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree_outgroup2_visual <- ggtree(tree_raxml_outgrouproot2)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+
+  geom_treescale(x=10)
+
+# plot together
+ggpubr::ggarrange(tree_outgroup_visual,tree_outgroup2_visual,nrow=1)
+
+```
+
+The second tree provides a similar ordering that accentuates the divergence of fabV. 
+
+---
+
+### Exercise 2 
+
+1. Use `ape::read.tree()` to read in the tree in `'RAxML_bipartitions.raw_enoyl_seqs'` and store it to the variable `my_tree_raxml`.
+
+```{r eval=FALSE, include=FALSE}
+
+___ <- ___::___.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+```
+
+
+2.  Use `ape::root()` to root the `my_tree_raxml` to the `outgroup = 'sp|P0AEK4|FABI_ECOLI'` and store it in the variable `my_rooted_tree`
+
+```{r eval=FALSE, include=FALSE}
+
+my_rooted_tree <- ape::root(___ ,outgroup = '___')
+
+```
+
+3. Visualize the `my_tree_raxml` using `ggtree()` with with annotation layers `geom_treescale(x=10)`, `geom_tiplab()`, and `geom_nodelab(aes(label=label))`
+
+```{r eval=FALSE, include=FALSE}
+
+ggtree(___)+
+  ___()+
+  geom_nodelab(aes(label=___))+
+  geom_treescale(x=___)
+
+```
+
+---
+
+The `ggtree` package offers a lot of customization options for your tree plots similar to `ggplot2`.
+
+We will now go over a variety of them below.
+
+First we will make a tree for a base comparison
+
+```{r}
+
+tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_outgrouproot_compare <- ape::root(tree_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree_raxml_outgrouproot_visual <- ggtree(tree_raxml_outgrouproot_compare)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+
+  geom_treescale(x=5)
+
+```
+
+
+Making tip labels smaller, making bootstrap values smaller and moving them a bit so they over lap less
+
+```{r}
+
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
+  geom_tiplab(size=2)+
+  geom_nodelab(aes(label=label),nudge_x=-.18,nudge_y=.4,size=2)+
+  geom_treescale(x=5)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
+
+```
+
+Adding tip points and offsetting the tip labels to accomodate them
+
+```{r}
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
+  geom_tiplab(size=2,offset=0.1)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.18,nudge_y=.4,size=2)+
+  geom_treescale(x=7)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
+
+```
+
+
+Convert the tree into a cladogram
+
+
+```{r}
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare, branch.length = 'none')+
+  geom_tiplab(size=2,offset=0.3)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.6,nudge_y=.4,size=2)+
+  geom_treescale(x=25)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
+
+```
+
+
+Have all tip labels be right-justified 
+
+
+```{r}
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
+  geom_tiplab(size=2,align = TRUE,offset=.3)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.18,nudge_y=.4,size=2)+
+  geom_treescale(x=7)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
+
+```
+
+Cladogram, circular tree 
+
+
+```{r}
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare, layout='circular',branch.length = 'none')+
+  geom_tiplab(size=2,offset=.01)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.18,nudge_y=.4,size=2)+
+  geom_treescale(x=20)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
+
+```
+
+
+Circular tree with branch lengths, all tips aligned to the same branch length
+
+
+```{r}
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare, layout='circular')+
+  geom_tiplab(size=2,align=TRUE,offset=.01)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.18,nudge_y=.4,size=2)+
+  geom_treescale(x=4)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
+
+```
+
+---
+
+### Exercise 3
+
+1. Read in two trees: `'raw_enoyl_seqs.nwk'` and `'RAxML_bipartitions.raw_enoyl_seqs'` with `ape::read.tree()`. Store in the variables `tree1_fasttree` and `tree2_raxml`
+
+```{r eval=FALSE, include=FALSE}
+
+___ <- ape::read.tree('___')
+
+tree2_raxml <- ape::read.___('___')
+
+```
+
+2. For both `tree1_fasttree` and `tree2_raxml`, use `ape::root()` to root the tree to the leaf using `outgroup='tr|E6KYQ2|E6KYQ2_9PAST'`
+
+```{r eval=FALSE, include=FALSE}
+
+tree1_fasttree <- ape::___(tree1_fasttree ,outgroup='___')
+
+___ <- ape::___(tree2_raxml ,___='tr|E6KYQ2|E6KYQ2_9PAST')
+
+```
+
+3. Run `ggtree()` on both both `tree1_fasttree` and `tree2_raxml` and store them in variables `tree1_fasttree_visual` and `tree2_raxml_visual`
+
+```{r eval=FALSE, include=FALSE}
+
+___ <- ggtree(tree1_fasttree)+
+  geom_tiplab(size=2,align = TRUE,offset=.3)+
+  geom_tippoint(aes(color=label))+
+  geom_treescale(x=7)+
+  theme(legend.position='none')
+
+tree2_raxml_visual <- ggtree(___)+
+  geom_tiplab(size=2,align = TRUE,offset=.3)+
+  geom_tippoint(aes(color=label))+
+  geom_treescale(x=7)+
+  theme(legend.position='none')
+
+```
+
+4. Use `ggpubr::ggarrange()` to plot both `tree1_fasttree` and `tree2_raxml` side by side
+
+```{r eval=FALSE, include=FALSE}
+
+ggpubr::___(___, ___)
+
+```
+
+5. Add the annotation layer `scale_x_reverse()` to flip the orientation of the `tree2_raxml_visual` tree
+
+```{r eval=FALSE, include=FALSE}
+
+___ <- ggtree(tree2_raxml)+
+  geom_tiplab(size=2,align = TRUE,offset=-.1,hjust=1)+
+  geom_tippoint(aes(color=label))+
+  geom_treescale(x=-7)+
+  theme(legend.position='none')+
+  ___
+
+tree2_raxml_visual
+
+```
+
+6. Use `ggpubr::ggarrange()` to plot the flipped `tree2_raxml_visual` next to `tree1_fasttree_visual`
+
+```{r eval=FALSE, include=FALSE}
+
+ggpubr::___(___, ___)
+
+```
+
+
+----
+
+One last thing we'll touch on are zooming in on specific areas of the tree. 
+
+The nodes of each tree can be visualized
+
+```{r}
+
+tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
+  geom_tiplab(size=2,align=TRUE,offset=.01)+
+  geom_nodepoint(color='blue',shape=9)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.08,nudge_y=.4,size=2)+
+  geom_treescale(x=4)
+
+tree_compare
+```
+
+
+In each ggtree object there exist a list of node numbers. These numbers are different from the bootstrap numbers assigned to a node. 
+
+We can list them the internal node numbers on the tree:
+
+```{r}
+
+ggtree(tree_raxml_outgrouproot_compare)+
+  geom_text2(aes(label=node), hjust=-.3,size=3)
+
+```
+
+This gives us all node numbers. But we really only want those that are at actual nodes at each branching and not those that are on the leaves.
+
+
+```{r}
+
+ggtree(tree_raxml_outgrouproot_compare)+
+  geom_nodelab(aes(label=node),hjust=-.3,size=3,color='blue')+
+  geom_treescale(x=2)
+
+```
+
+
+Knowing these node values is useful because now we can use this information to subset the tree and zoom in on a specific portion of it.
+
+
+```{r}
+
+tree_raxml_outgrouproot_visual <- ggtree(tree_raxml_outgrouproot_compare)+
+  geom_nodelab(aes(label=node),hjust=-.3,size=3,color='blue')+
+  geom_tiplab(size=3)+
+  geom_treescale(x=7)
+
+zoomin_visual <- viewClade(tree_raxml_outgrouproot_visual, node=25)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,zoomin_visual)
+
+```
+
+If we know the structure of the tree, and its nodes, we can clean up the code so that we show bootstraps instead of internal node numbers.
+
+```{r}
+
+tree_raxml_outgrouproot_visual <- ggtree(tree_raxml_outgrouproot_compare)+
+    geom_nodelab(aes(label=label),nudge_x=-.15,nudge_y=.4,size=2)+
+  geom_tiplab(size=3)+
+  geom_treescale(x=7)
+
+zoomin_visual <- viewClade(tree_raxml_outgrouproot_visual, node=25)
+
+ggpubr::ggarrange(tree_raxml_outgrouproot_visual,zoomin_visual)
+
+
+```
+
+---
+
+### Exercise 4
+
+1. Read in the `'RAxML_bipartitions.raw_enoyl_seqs'` tree using `ape::read.tree()`. Store in the variable `tree1_raxml`. Root the tree to `'tr|E6KYQ2|E6KYQ2_9PAST'` using `ape::root`. 
+Make a tree, `tree1_raxml_visual` with `ggtree()` showing each internal `label=node` using `geom_nodelab()`
+
+```{r eval=FALSE, include=FALSE}
+
+___ <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+tree1_raxml <- ape::root(___ ,outgroup='___')
+
+tree1_raxml_visual <- ggtree(tree1_raxml)+
+  ___(aes(label=___),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_tiplab(size=3)+
+  geom_treescale(x=7)
+
+tree1_raxml_visual
+
+```
+
+
+2. Zoom in on node 35 with `viewClade()` and store the zoomed in visual in the variable `zoomin_visual1`
+
+```{r eval=FALSE, include=FALSE}
+
+___ <- ___(tree1_raxml_visual, node=35)
+
+zoomin_visual1
+
+```
+
+---
+
+[There are many more options for manipulating trees available, view them here!](https://bioconductor.statistik.tu-dortmund.de/packages/3.5/bioc/vignettes/ggtree/inst/doc/treeManipulation.html)
+
+Thanks for coming to Day 1!
+
+

@@ -1,0 +1,202 @@
+---
+title: "Day1_answers"
+author: "Alex McFarland"
+date: "8/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(treeio)
+library(phytools)
+library(ape)
+library(ggpubr)
+
+setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop')
+
+
+```
+
+# Day 1 answers
+
+---
+### Exercise 1
+
+1.  Use `ape::read.tree()` to read in the file `raw_enoyl_seqs.nwk` and assign it to the variable `my_nwk`
+
+```{r}
+
+my_nwk <- ape::read.tree('raw_enoyl_seqs.nwk')
+
+```
+
+
+2. Display the `my_nwk` tree using `ggtree()`
+
+```{r}
+
+ggtree(my_nwk)
+
+```
+
+3. Show the `geom_tiplab()` for each leaf in the `ggtree()` visualization of `my_nwk`
+
+```{r}
+
+ggtree(my_nwk)+
+  geom_tiplab()
+
+```
+
+
+4. Modify the code from part 3 so that the x-axis is rescaled at `x=7` using `geom_treescale()`
+
+```{r}
+
+ggtree(my_nwk)+
+  geom_tiplab()+ # show tip labels
+  geom_treescale(x=7) # recenter the tree
+  
+```
+
+---
+
+### Exercise 2 
+
+1. Use `ape::read.tree()` to read in the tree in `'RAxML_bipartitions.raw_enoyl_seqs'` and store it to the variable `my_tree_raxml`.
+
+```{r}
+
+my_tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+```
+
+
+2.  Use `ape::root()` to root the tree to the outgroup `sp|P0AEK4|FABI_ECOLI` and store it in the variable `my_rooted_tree`
+
+```{r}
+
+my_rooted_tree <- ape::root(my_tree_raxml ,outgroup='sp|P0AEK4|FABI_ECOLI')
+
+```
+
+3. Visualize the tree using `ggtree()` with with annotation layers `geom_treescale(x=10)`, `geom_tiplab()`, and `geom_nodelab(aes(label=label))`
+
+```{r}
+
+ggtree(my_rooted_tree)+
+  geom_tiplab()+
+  geom_nodelab(aes(label=label))+
+  geom_treescale(x=10)
+
+```
+
+### Exercise 3
+
+1. Read in two trees: `'raw_enoyl_seqs.nwk'` and `'RAxML_bipartitions.raw_enoyl_seqs'` with `ape::read.tree()`. Store in the variables `tree1_fasttree` and `tree2_raxml`
+
+```{r}
+
+tree1_fasttree <- ape::read.tree('raw_enoyl_seqs.nwk')
+
+tree2_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+```
+
+2. For both trees, use `ape::root()` to root the tree to the leaf `'tr|E6KYQ2|E6KYQ2_9PAST'`
+
+```{r}
+
+tree1_fasttree <- ape::root(tree1_fasttree ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree2_raxml <- ape::root(tree2_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+```
+
+3. Run `ggtree()` on both sets of trees and store them in variables `tree1_fasttree_visual` and `tree2_raxml_visual`
+
+```{r}
+
+tree1_fasttree_visual <- ggtree(tree1_fasttree)+
+  geom_tiplab(size=2,align = TRUE,offset=.3)+
+  geom_tippoint(aes(color=label))+
+  geom_treescale(x=7)+
+  theme(legend.position='none')
+
+tree2_raxml_visual <- ggtree(tree2_raxml)+
+  geom_tiplab(size=2,align = TRUE,offset=.3)+
+  geom_tippoint(aes(color=label))+
+  geom_treescale(x=7)+
+  theme(legend.position='none')
+
+```
+
+4. Use `ggpubr::ggarrange()` to plot both trees side by side
+
+```{r}
+
+ggpubr::ggarrange(tree1_fasttree_visual, tree2_raxml_visual)
+
+```
+
+5. Add the annotation layer `scale_x_reverse()` to flip the orientation of the tree visualization
+
+```{r}
+
+tree2_raxml_visual <- ggtree(tree2_raxml)+
+  geom_tiplab(size=2,align = TRUE,offset=-.1,hjust=1)+
+  geom_tippoint(aes(color=label))+
+  geom_treescale(x=-7)+
+  theme(legend.position='none')+
+  scale_x_reverse()
+
+tree2_raxml_visual
+
+```
+
+6. Use `ggpubr::ggarrange()` to plot the flipped `tree2_raxml_visual` next to `tree1_fasttree_visual`
+
+```{r}
+
+ggpubr::ggarrange(tree1_fasttree_visual, tree2_raxml_visual)
+
+```
+
+
+----
+
+### Exercise 4
+
+1. Read in the `'RAxML_bipartitions.raw_enoyl_seqs'` tree using `ape::read.tree()`. Store in the variable `tree1_raxml`. Root the tree to `'tr|E6KYQ2|E6KYQ2_9PAST'` using `ape::root`. 
+Make a tree showing each internal node label using `geom_nodelab()`
+
+```{r}
+
+tree1_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+tree1_raxml <- ape::root(tree1_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree1_raxml_visual <- ggtree(tree1_raxml)+
+  geom_nodelab(aes(label=node),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_tiplab(size=3)+
+  geom_treescale(x=7)
+
+tree1_raxml_visual
+
+```
+
+
+2. Zoom in on node 35 and store the zoom in visual in the variable `zoomin_visual1`
+
+```{r}
+
+zoomin_visual1 <- viewClade(tree1_raxml_visual, node=36)
+
+zoomin_visual1
+
+```
+
+---
+
