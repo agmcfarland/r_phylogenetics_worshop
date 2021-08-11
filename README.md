@@ -41,6 +41,8 @@ Each day has a knitted R Markdown .html file that can be used as a reference. Ex
 
 Click on the green Code button and choose Download Zip, unzip the folder on your computer, open the appropriate R Markdown file. 
 
+Please make sure that you have all packages installed! The `install.packages()` command for each package is included in the first code cell of each R Markdown file.
+
 
 ## Parts of a tree
 
