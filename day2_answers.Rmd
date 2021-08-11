@@ -1,0 +1,270 @@
+---
+title: "Day2_answers"
+author: "Alex McFarland"
+date: "8/12/2021"
+output: html_document
+---
+
+```{r}
+
+#install.packages('ggtree')
+#install.packages('ggplot2')
+#install.packages('dplyr')
+#install.packages('treeio')
+#install.packages('phytools')
+#install.packages('ape')
+#install.packages('ggpubr')
+#install.packages('ggnewscale')
+
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(treeio)
+library(phytools)
+library(ape)
+library(ggpubr)
+library(ggnewscale)
+
+setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop') # change this to your R Markdown's file path
+
+
+```
+
+### Exercise 1
+
+We will now practice attaching metadta to a tree and changing the tip label names to be the `gene_name`
+
+1. Read in the tree using `ape:read.tree()` and set the outgroup to `'tr|E6KYQ2|E6KYQ2_9PAST'` using `ape::root()`. Stoe in the variable `tree_raxml_ex`
+
+
+```{r}
+tree_raxml_ex <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_ex <- ape::root(tree_raxml_ex ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree_raxml_ex_visual <- ggtree(tree_raxml)+
+  geom_nodelab(aes(label=node),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_tiplab(size=3)+
+  geom_treescale(x=7)
+
+```
+
+
+2. Read in the metadata stored in `df_meta_ex` from the file `'enoyl_metadata.csv'`. Afterwards, read in a second tree but store to the variable `tree_raxml_ex2`.
+
+
+```{r}
+
+df_meta_ex <- read.csv('enoyl_metadata.csv')
+
+tree_raxml_ex2 <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_ex2 <- ape::root(tree_raxml_ex2 ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree_raxml_ex_visual2 <- ggtree(tree_raxml_ex2)+
+  geom_nodelab(aes(label=node),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_treescale(x=7)
+
+tree_raxml_ex_visual2
+
+```
+
+3. Attach the metadata, `df_meta_ex` to the tree visualization object, `tree_raxml_ex_visual2` using the `%<+%` operator. 
+
+Add the annotation layer `geom_tiplab()` specify the aesthetic , `aes()`, for `label=gene_name`
+
+```{r}
+
+tree_raxml_ex_visual2 <- tree_raxml_ex_visual2%<+%df_meta_ex+
+    geom_tiplab(aes(label=gene_name))
+
+tree_raxml_ex_visual2
+```
+
+4. Plot all the two different tree visualizations, `tree_raxml_ex_visual`, and `tree_raxml_ex_visual2` together using `ggpubr::ggarrange()`
+
+```{r}
+
+ggpubr::ggarrange(tree_raxml_ex_visual,tree_raxml_ex_visual2)
+
+```
+
+---
+
+### Exercise 2
+
+Let's identify where our `novel` gene is located within the tree. To do so, we will need to attach our tree to our metatdata and specificy which tip label is our novel gene.
+
+1. Read in the metadata stored in `df_meta_ex` from the file `'enoyl_metadata.csv'`. Afterwards, read in tree `'RAxML_bipartitions.raw_enoyl_seqs'` using `ape::read.tree()` and store in the variable `tree_raxml_ex`.  Set outgroup to `'tr|E6KYQ2|E6KYQ2_9PAST'` using `ape::root()`
+
+
+
+```{r}
+
+df_meta_ex <- read.csv('enoyl_metadata.csv')
+
+tree_raxml_ex <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_ex <- ape::root(tree_raxml_ex ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+```
+
+2. Make a base `ggtree()` object, `base_tree_ex`.
+
+
+```{r}
+
+base_tree_ex <- ggtree(tree_raxml_ex)
+
+```
+
+3.  Attach the metadata, `df_meta_ex` to the tree visualization object, `tree_raxml_ex_visual` using the `%<+%` operator. Set the color of the tip point to be equal to the `as.factor(novel)`
+
+```{r}
+
+tree_raxml_ex_visual1 <- base_tree_ex%<+%df_meta_ex+
+  geom_nodelab(aes(label=label),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_tiplab(aes(label=gene_name), hjust=-.25)+
+  geom_treescale(x=7)+
+  geom_tippoint(aes(color=as.factor(novel)))+
+  labs(color='novel')
+
+tree_raxml_ex_visual1
+
+```
+
+---
+
+### Exercise 3
+
+You want to show a tree that displays qualitative high or low scores for triclosan tolerance on the tip points and only shows the gene names on the tip labels.
+
+1. Update the metadata dataframe, `df_meta_ex` using `mutate()` and `case_when()` so that a new column, `tolerance_binary` is created when `triclosan_tolerance<64` it is given the descriptor `'low'`. Otherwise (`TRUE`) assign `'high'`.
+
+Make a second column `tolerance_binary_names` but has the `gene_name` when `triclosan_tolerance<64`. Otherwise (`TRUE`), assign the empty string `''`.
+
+
+
+
+```{r}
+
+df_meta_ex <- read.csv('enoyl_metadata.csv')
+
+tree_raxml_ex <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_ex <- ape::root(tree_raxml_ex ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+df_meta_ex <- read.csv('enoyl_metadata.csv')
+
+#update metadata
+df_meta_ex <- df_meta_ex%>%
+  mutate(tolerance_binary = case_when(triclosan_tolerance<64~'low',
+                                   TRUE~'high'))%>%
+  mutate(tolerance_binary_names = case_when(triclosan_tolerance<64~gene_name,
+                                            TRUE~''))
+
+```
+
+
+
+2. Make a base tree, `tree_raxml_visual_ex` from the tree object `tree_raxml_ex` using `ggtree()`.
+
+Afterwards, add the `geom_tiplab()` annotation layer and set the `aes(label=tolerance_binary_names)`
+
+Add another annotation layer, `geom_tippoint()` and set the `aes(color=as.factor(tolerance_binary))`
+
+```{r}
+
+#make the base tree
+tree_raxml_visual_ex <- ggtree(tree_raxml_ex)
+
+# add metadata and annotation layers to base tree
+tree_raxml_visual_ex <- tree_raxml_visual_ex%<+%df_meta_ex+
+  geom_tiplab(aes(label=tolerance_binary_names), size = 3, hjust=-.25)+
+  geom_tippoint(aes(color=as.factor(tolerance_binary)))+
+  geom_nodelab(aes(label=label),nudge_x=-.1,nudge_y=.4,size=2,color='blue')+
+  geom_treescale(x=4, color=NA)+
+  labs(color = "triclosan_tolerance")
+
+tree_raxml_visual_ex
+
+```
+
+---
+
+
+### Exercise 4
+
+Make a heatmap relating the phylogenetic relationship of the genes and the community from which they were recovered.
+
+1. read in `'RAxML_bipartitions.raw_enoyl_seqs'` with `ape::read.tree()` and assign it to `tree_raxml_ex`. root the tree with `ape::root()` and specify the gene `'tr|E6KYQ2|E6KYQ2_9PAST'`. 
+
+Assign a tree visualization `tree_raxml_ex` made with `ggtree()` to `tree_raxml_visual_ex`
+
+Read in the metadata file `'enoyl_metadata.csv'` and assign it to `df_meta_ex`
+
+```{r}
+
+# base tree 
+tree_raxml_ex <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_ex <- ape::root(tree_raxml_ex ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree_raxml_visual_ex <- ggtree(tree_raxml_ex)
+
+# metadata update
+df_meta_ex <- read.csv('enoyl_metadata.csv')
+
+```
+
+
+2. Attached `df_meta_ex` to `tree_raxml_visual_ex`. Add the annotation layers `geom_tiplab()`, `geom_tippoint()`, and `geom_nodelabel`. For both `label` aesthetics,`aes(label=gene_name)`
+
+
+
+```{r}
+
+# using the orginal dataframe, df_meta
+treevis_ex <- tree_raxml_visual_ex%<+%df_meta_ex+
+  geom_tiplab(aes(label=gene_name), align=TRUE, size = 3, hjust=-.25)+
+  geom_tippoint(aes(color=gene_name))+
+  geom_nodelab(aes(label=label),nudge_x=-.14,nudge_y=.4,size=2,color='blue')+
+  geom_treescale(x=4,color='transparent')+
+  labs(color='gene family')
+
+treevis_ex
+
+```
+
+
+3. `select()` the columns `community_A`, and `community_B` from `df_meta_ex`. Set the `rownames()` of `df_meta_subset_ex` to be those from `df_meta_ex$gene_id`.
+
+Convert both sets of columns to factors using `as.factor()`
+
+Use `gheatmap()` to plot `treevis_ex` and `df_meta_subset` side by side. 
+
+Specify the colors using `scale_fill_manual` for the binary data community values so that `values=c("0"="white", "1"="blue"))`
+
+```{r}
+
+# selecting the columns community_A, community_B and placing them into a new dataframe
+df_meta_subset_ex <- df_meta_ex%>%select(community_A,community_B)
+
+# convert the colunms to factors
+df_meta_subset_ex$community_A <- as.factor(df_meta_subset_ex$community_A)
+df_meta_subset_ex$community_B <- as.factor(df_meta_subset_ex$community_B)
+
+# making the rownames of the new dataframe equal to the gene_id column of the original dataframe
+rownames(df_meta_subset_ex) <- df_meta_ex$gene_id
+
+# using gheatmap to plot the tree and the heatmap together
+treevis_ex_heat <- gheatmap(treevis_ex, df_meta_subset_ex, font.size = 2.8, color='black')+
+  scale_fill_manual(values=c("0"="white", "1"="blue"), name='present in\ncommunity')
+
+treevis_ex_heat
+
+```
+
+The community heatmap neatly demonstratest that the occurrence of these genes closely matches phylogeny. But we also know from our tolerance heatmaps that the community occurrence also matches the presence of highly triclosan tolerant genes. 
+
+---
