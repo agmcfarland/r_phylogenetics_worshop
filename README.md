@@ -34,6 +34,8 @@ There are three R Markdown (.rmd) files for each day of the workshop.
 
 There are also three R Markdown files containing the answers to each of the day's exercises. 
 
+Each day has a knitted R Markdown .html file that can be used as a reference. Exercise code is left unrun.
+
 
 ## Running workshop code
 

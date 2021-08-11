@@ -1,15 +1,22 @@
 ---
-title: "Day1"
+title: "Day 1: 100% of what you need to know to make basic trees in R"
 author: "Alex McFarland"
 date: "8/11/2021"
 output: html_document
 ---
+
+- Section 1: Reading in different phylogenetic tree file types
+- Section 2: Basic tree plotting with ggtree
 
 ```{r setup}
 
 #install.packages('ggtree')
 #install.packages('ggplot2')
 #install.packages('dplyr')
+#install.packages('treeio')
+#install.packages('phytools')
+#install.packages('ape')
+#install.packages('ggpubr')
 
 library(ggtree)
 library(ggplot2)
@@ -19,14 +26,9 @@ library(phytools)
 library(ape)
 library(ggpubr)
 
-setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop')
+setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop') # change this to your R Markdown's file path
 
 ```
-
-# Day 1:  100% of what you need to know to make basic trees in R
-
-- Section 1: Reading in different phylogenetic tree file types
-- Section 2: Basic tree plotting with ggtree
 
 
 We will learn about reading and plotting trees using a set of 20 genes that belong to four different classes of enoyl reductases (five per class) that are involved in fatty acid synthesis. These are fabK, fabG, fabV, and fabI. 
