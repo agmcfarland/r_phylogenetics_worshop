@@ -46,7 +46,15 @@ Here are some useful terms to know when working with trees. The `ggtree()` equia
 
 <img src="images/tree_parts.png" alt="different terms used to describe a tree" width=1000>
 
+
+## Reductase gene metadata
+
+The metadata used throughout the workshop for reference.
+
+<img src="images/reductase_metadata.png" alt="metadata for reductase genes" width=1000>
+
 ---
+
 
 
 ## Acknowledgements and references 
