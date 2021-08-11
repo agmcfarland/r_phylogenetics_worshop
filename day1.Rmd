@@ -445,7 +445,7 @@ ggpubr::___(___, ___)
 
 ----
 
-One last thing we'll touch on are zooming in on specific areas of the tree. 
+One last thing we'll touch on are zooming in on specific areas of the tree and collapsing branches.
 
 The nodes of each tree can be visualized
 
@@ -464,7 +464,7 @@ tree_compare
 
 In each ggtree object there exist a list of node numbers. These numbers are different from the bootstrap numbers assigned to a node. 
 
-We can list them the internal node numbers on the tree:
+We can list ALL node numbers (including those that belong to leaves) on the tree using `geom_text2()`
 
 ```{r}
 
@@ -550,6 +550,117 @@ zoomin_visual1
 ```
 
 ---
+
+Branches can be `collapse()`'d at specified nodes. The node can be marked with `geom_point2()` to more clearly indicate the branch was collapsed.
+
+```{r}
+
+# collapse, no marker
+tree_raxml_outgrouproot_visual2 <- collapse(tree_raxml_outgrouproot_visual, node=36)
+
+tree_raxml_outgrouproot_visual2
+
+
+# collapse, with marker
+tree_raxml_outgrouproot_visual2 <- tree_raxml_outgrouproot_visual2+
+  geom_point2(aes(subset=(node==36)))
+
+tree_raxml_outgrouproot_visual2
+
+
+# Multiple nodes collapsed 
+
+tree_raxml_outgrouproot_visual3 <- collapse(tree_raxml_outgrouproot_visual2, node=24)+
+  geom_point2(aes(subset=(node==24)))
+
+tree_raxml_outgrouproot_visual3
+
+```
+
+Nodes can be collapsed but still show the extent of the phylogenetic diversity that they capture
+
+```{r}
+
+collapse(tree_raxml_outgrouproot_visual, node=36, 'max')
+
+collapse(tree_raxml_outgrouproot_visual, node=36, 'min')
+
+collapse(tree_raxml_outgrouproot_visual, node=36, 'mixed')
+
+
+```
+
+
+Branches can be highlighted using `geom_highight()` 
+
+```{r}
+
+tree_raxml_outgrouproot_visual4 <- tree_raxml_outgrouproot_visual+
+  geom_highlight(35, 'lightblue')
+
+tree_raxml_outgrouproot_visual4
+
+```
+
+
+Branches and clades can be annotated using `geom_cladelabel()`
+
+
+```{r}
+
+tree_raxml_outgrouproot_visual+
+  geom_cladelabel(node=35, label='fabG', align=TRUE,offset = 2, angle=90, vjust=2, hjust=0.5)
+
+```
+
+
+One last thing we might want to do is not display any bootstrap value less than 50. This requires altering the tree itself, not the tree visualization object.
+
+
+```{r}
+
+tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_outgrouproot <- ape::root(tree_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+tree_raxml_outgrouproot$node.label[as.numeric(tree_raxml_outgrouproot$node.label)<50] <- '' # make bootstrap values less than 50 an empty character
+
+tree_raxml_outgrouproot$node.label[as.character(tree_raxml_outgrouproot$node.label)=='Root'] <- '' #make the word `Root` and empty character
+
+```
+
+
+Now we can combine all of the above steps to make an informative plot.
+
+We know our node numbers from previous visualizations but we want to show bootstrap values. We also want bootstrap values less than 50 to not be displayed since we deem them uninformative and cluttering the visualization.
+
+We also want to highlight that fabG has some variation but that one fabG, which is novel, is on a different clade, closer to FabV. We are not too interested in fabV other than it's location, so we want to collapse it. 
+
+Putting it all together.
+
+
+```{r}
+
+
+tree_raxml_outgrouproot_visual6 <- ggtree(tree_raxml_outgrouproot)+
+  geom_tiplab(size=2,offset=0.1)+
+  geom_tippoint()+
+  geom_nodelab(aes(label=label),nudge_x=-.1,nudge_y=.4,size=2)+
+  geom_treescale(x=7, color=NA)
+
+tree_raxml_outgrouproot_visual6 <- collapse(tree_raxml_outgrouproot_visual6, node=24,'max')
+
+tree_raxml_outgrouproot_visual6 <- tree_raxml_outgrouproot_visual6+
+  geom_highlight(35, 'lightblue')+
+  geom_cladelabel(node=35, label='fabG', align=TRUE,offset = 1.2, angle=90, vjust=2, hjust=0.5)+
+  geom_cladelabel(node=24, label='fabV', align=TRUE,offset = -.2, angle=90, vjust=2, hjust=0.5)+
+  geom_cladelabel(node=2, label='novel\nfabG', align=TRUE,offset = 1.1, angle=90, vjust=2, hjust=0.5, color='blue')
+
+tree_raxml_outgrouproot_visual6
+
+
+```
+
 
 [There are many more options for manipulating trees available, view them here!](https://bioconductor.statistik.tu-dortmund.de/packages/3.5/bioc/vignettes/ggtree/inst/doc/treeManipulation.html)
 
