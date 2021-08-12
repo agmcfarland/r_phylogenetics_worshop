@@ -73,7 +73,7 @@ tree_raxml_visual
 
 ```
 
-The tip labels are currently not have very clear gene names compared to those present in our metadata. We can change them!
+The tip labels are currently do not have very clear gene names compared to those present in our metadata. We can change them!
 
 But first we need to make sure our metadata, `df_meta` has the first column with labels that match exactly each `tree_raxml$tip.label`
 
@@ -82,6 +82,12 @@ We will first make sure that this is true using the `setdiff()` function from ba
 
 ```{r}
 
+# remembeer that each tree object has data within it that can be accessed with `$` 
+tree_raxml$tip.label
+
+df_meta$gene_name
+
+# set diff returns all differences between two lists
 setdiff(tree_raxml$tip.label, df_meta$gene_name)
 
 
