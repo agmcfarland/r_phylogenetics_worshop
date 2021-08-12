@@ -5,6 +5,10 @@ date: "8/12/2021"
 output: html_document
 ---
 
+- Section 1: Using metadata to subset and highlight features of a tree
+
+- Section 2: Plot trees alongside heatmaps
+
 ```{r setup}
 
 #install.packages('ggtree')
@@ -29,7 +33,6 @@ setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_w
 
 ```
 
-# Day 2
 
 - Section 1: Using metadata to subset and highlight features of a tree
 
@@ -106,15 +109,21 @@ tree_raxml_visual <- ggtree(tree_raxml)+
   geom_tiplab(size=3)+
   geom_treescale(x=7)
 
+tree_raxml_visual
 
 # tree with added metadata 
 tree_raxml_visual2 <- ggtree(tree_raxml)+
   geom_nodelab(aes(label=label),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
   geom_treescale(x=7)
 
+tree_raxml_visual2
+
 # adding the metadata
 tree_raxml_visual2 <- tree_raxml_visual2%<+%df_meta+
   geom_tiplab(aes(label=gene_name))
+
+
+tree_raxml_visual2
 
 # plotting side by side for comparison
 ggpubr::ggarrange(tree_raxml_visual, tree_raxml_visual2)
@@ -548,12 +557,25 @@ The community heatmap neatly demonstratest that the occurrence of these genes cl
 ---
 
 
-We can add additional annotations like we would in `ggplot()` to our plot to make it more presentable
+Sometimes it is useful to display multiple types of heatmap data next to a single phylogenetic tree. Here is an example of how to do it.
 
 ```{r}
 
-## make the tree and the first heatmap
+# read in data
+tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
 
+tree_raxml <- ape::root(tree_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+#make the base tree
+tree_raxml_visual <- ggtree(tree_raxml)
+
+# read in metadata
+df_meta <- read.csv('enoyl_metadata.csv')
+
+
+### make the tree and the first heatmap
+
+## the tree uses the metadata to change the tiplabs to the gene_name and color in tippoints by gene_name
 # using the orginal dataframe, df_meta
 treevis5 <- tree_raxml_visual%<+%df_meta+
   geom_tiplab(aes(label=gene_name), align=TRUE, size = 3, hjust=-.25)+
@@ -562,6 +584,9 @@ treevis5 <- tree_raxml_visual%<+%df_meta+
   geom_treescale(x=4,color='transparent')+
   labs(color='gene family')
 
+
+## Now we add the first heat map
+
 # selecting the columns triclosan_tolerance,ampicillin_tolerance,tetracycline_tolerance and placing them into a new dataframe
 df_meta_subset <- df_meta%>%select(triclosan_tolerance,ampicillin_tolerance,tetracycline_tolerance)%>%rename(TCS=triclosan_tolerance, AMP=ampicillin_tolerance, TET=tetracycline_tolerance)
 # making the rownames of the new dataframe equal to the gene_id column of the original dataframe
@@ -569,7 +594,6 @@ rownames(df_meta_subset) <- df_meta$gene_id
 
 # using gheatmap to plot the tree and the heatmap together
 treevis5_heat <- gheatmap(treevis5, df_meta_subset, font.size = 2.5, high='darkblue',low='lightblue', color='white',legend_title='tolerance\n(mg/ml)',offset=1)
-
 
 ## Adding the second heatmap
 
