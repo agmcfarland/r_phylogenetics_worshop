@@ -1,0 +1,398 @@
+---
+title: "Day 3: Incorporating trees with quantitative data"
+author: "Alex McFarland"
+date: "8/12/2021"
+output: html_document
+---
+
+Section 1: Adding ancestral reconstruction state data to trees
+
+Section 2: Comparing and visualizing different tree topologies
+
+Section 3: Plotting trees with bar plots
+
+
+```{r setup}
+
+#install.packages('ggtree')
+#install.packages('ggplot2')
+#install.packages('dplyr')
+#install.packages('treeio')
+#install.packages('phytools')
+#install.packages('ape')
+#install.packages('ggpubr')
+#install.packages('ggnewscale')
+
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(treeio)
+library(phytools)
+library(ape)
+library(ggpubr)
+library(ggnewscale)
+library(ggstance)
+
+setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop') # change this to your R Markdown's file path
+
+```
+
+### Section 1: Adding ancestral reconstruction state data to trees
+
+Ancestral state reconstruction is a useful method that assess the likelihood of a specific trait occurring given a phylogeny. 
+
+The likelihood that a trait occurs can be visualized as a pie graph on each node in a tree
+
+There are a few steps that need to be taken to do this. 
+
+The first is to read in metadata that has one column that matches the `tip.label`s found in a tree
+
+
+```{r}
+
+# read in metadata
+df_meta <- read.csv('enoyl_metadata.csv')
+
+# read in tree
+tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+# root tree
+tree_raxml <- ape::root(tree_raxml, outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+
+# check that metadata and tree have the same tip labels
+setdiff(df_meta$gene_id, tree_raxml$tip.label)
+
+```
+
+
+Now that both the metadata and the tree have been read in and verified to have the same `tip.label`s, we need to select which discrete variable we wish to examine.
+
+We will examine the trait of any given gene conferring high triclosan tolerance (>=64 mg/ml). We need to make a new column, `tolerance_binary` that provides this as a binary variable
+
+
+```{r}
+
+df_meta <- df_meta%>%
+  mutate(tolerance_binary = case_when(triclosan_tolerance >= 64 ~ 'high',
+                                    TRUE ~ 'low'))
+
+```
+
+
+Now we will use the `ape::ace()` package to conduct ancestral trait reconstruction. 
+
+This function takes as input a NAMED vector of trait values. Each trait value is associated with one `tip.label`.
+
+Because we know that the tree `tip.label` matches the `df_meta$gene_id`, we will make `names()` of the `traitvals` equal to `df_meta$gene_id`
+
+```{r}
+
+# vector of trait values
+traitvals <- df_meta$tolerance_binary
+
+traitvals
+
+# associating each value with its corresponding gene_id/tip.label
+names(traitvals) <- df_meta$gene_id
+
+traitvals
+
+```
+
+
+Now we are ready to conduct the ancestral state reconstruction. 
+
+```{r}
+
+# One idioscynracy of ancestral trait reconstruction is that all branch lengths must be greater than 0. If there are branches with length 0, make them very very small!
+tree_raxml$edge.length[tree_raxml$edge.length == 0] <- 1e-7
+
+# run reconstruction model
+fitER <- ape::ace(traitvals, tree_raxml, 
+             type="discrete",
+             method="ML",
+             CI=TRUE,
+             model="ARD",
+             scaled=TRUE,
+             kappa=1,
+             corStruct = NULL,
+             ip = 0.1,
+             use.expm = FALSE,
+             use.eigen = TRUE,
+             marginal = FALSE)
+
+# the reconstruction model gives us a bunch of data stored in the dataframe `fitER`
+fitER
+fitER$se
+fitER$loglik
+fitER$rates
+fitER$lik.anc
+```
+
+We will now make a new dataframe called df_ancstats from the ancestral state reconstruction values
+
+```{r}
+
+# dataframe of values
+df_ancstats <- as.data.frame(fitER$lik.anc)
+# specify the node each value belongs to. We do this by getting the range of nodes in the tree and add the total number of nodes to each item the range
+1:Nnode(tree_raxml)
+
+Ntip(tree_raxml)
+
+df_ancstats$node <- 1:Nnode(tree_raxml)+Ntip(tree_raxml)
+
+df_ancstats
+
+```
+
+Now we can plot the values using `ggtree()` using a function from ggtree called `nodepie()`
+
+```{r}
+
+# make a pie chart for each individual probability
+pies <- nodepie(df_ancstats,cols=c('high','low'),alpha=0.8)
+
+pies
+
+# make base tree
+base_tree <- ggtree(tree_raxml)
+
+
+# now make tree with pie charts in the node.s for the ancestral state reconstruction
+tree_pie <- base_tree+
+  geom_inset(pies,width=.1, height=.1)+
+  geom_tiplab(size=2.6,align = TRUE,offset=.05)+
+  geom_treescale(x=5, color=NA)
+
+tree_pie
+
+```
+
+---
+
+### Exercise 1
+
+Edit the above visualization so that the node pies are a different color, gene names are used, and a zoomed in visualization is provided.
+
+1. Associate `df_meta` with `base_tree` using the `%<+%` operator. Set the `geom_tiplab()` `aes(label=gene_name)`
+
+```{r eval=FALSE, include=FALSE}
+
+tree_vis_ex <- base_tree%<+%___+
+  geom_inset(pies,width=.1, height=.1)+
+  ___(size=2.6,align = TRUE,offset=.05, aes(___=___))+
+  geom_treescale(x=3, color=NA)
+
+tree_vis_ex
+
+```
+
+2. Use the `lapply()` function to changethe color of `pies` to `'orange'` and `'blue'`. Store in `pies2`
+
+Add the new `pies2` to `geom_inset()`
+
+```{r eval=FALSE, include=FALSE}
+
+pies <- nodepie(df_ancstats,cols=c('high','low'),alpha=0.8)
+___ <- lapply(___, function(g) g + scale_fill_manual(values = c('orange','blue')))
+
+tree_vis_ex2 <- base_tree%<+%df_meta+
+  ___(pies2,width=.1, height=.1)+
+  geom_tiplab(size=2.6,align = TRUE,offset=.05, aes(label=gene_name))+
+  geom_treescale(x=3, color=NA)
+
+tree_vis_ex2
+
+```
+
+3. Use `viewClade()` to zoom in on `node=25` and store in `zoom_in_vis`. After, use `ggpubr::ggarrange()` view `tree_vis_ex2` and `zoom_in_vis` side by side.
+
+```{r eval=FALSE, include=FALSE}
+
+zoom_in_vis <- ___(tree_vis_ex2, node=___)
+
+ggpubr::___(tree_vis_ex2, ___)
+
+```
+
+---
+
+### Section 2: Comparing and visualizing different tree topologies
+
+Trees with bootstraps can be visualized so that the other branching patterns are also visible. 
+
+Specifically, `RAxML` outputs a file with the prefix `'RAxML_boostrap.'` (different from the one we've been using with the prefix `'RAxML_bipartitions.'`)
+
+If we have run RAxML with 100 bootstraps, then this file will have the 100 different trees that were generated.
+
+We can view all 100 trees using `facet_wrap()` 
+
+
+```{r}
+
+# read in tree
+trees_raxml <- ape::read.tree('RAxML_bootstrap.raw_enoyl_seqs')
+
+trees_raxml
+
+# there are multiple trees within trees_raxml
+trees_raxml[[1]]
+
+trees_raxml[[2]]
+
+# All of them can be plotted at once 
+ggtree(trees_raxml)+
+  facet_wrap(~.id, ncol=10, nrow=10)
+
+```
+
+If we want to view 10 random trees we can do use the base function `sample()`
+
+```{r}
+
+random_trees <- sample(trees_raxml, size=10)
+
+ggtree(random_trees)+
+  facet_wrap(~.id, ncol=5,nrow=2)
+
+```
+
+Another neat visualization is using the `ggdenistree()` function from the ggtree package. This overlays all the trees, with the most dense branches representing higher agreements between trees.
+
+
+```{r}
+
+raxml_densitree <- ggdensitree(trees_raxml, alpha=0.4, color='lightblue')+
+  geom_tiplab(size=3)+
+  xlim(0,20)
+
+raxml_densitree
+
+```
+
+
+The densitree visualiation is a good companion to a traditional bootstrapped tree when plotted together.
+
+Note: we do not root the tree here because the 100 bootstraps are not rooted either.
+
+```{r}
+
+tree_raxml1 <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+
+tree_raxml_best <- ggtree(tree_raxml1)+
+  geom_nodelab(aes(label=node),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_tiplab(size=3)+
+  xlim(0,10)
+
+ggpubr::ggarrange(raxml_densitree, tree_raxml_best)
+
+```
+
+
+
+### Section 3: Plotting trees with bar plots
+
+Some data is associated with phylogenies is better presented as a bar plot. We can plot two separate items, a tree and a bar plot, together in a way that the data lines up using ggtree's `facet_plot()`
+
+```{r}
+
+# read in metadata
+df_meta <- read.csv('enoyl_metadata.csv')
+
+# read in tree
+tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
+# root tree
+tree_raxml <- ape::root(tree_raxml, outgroup='tr|E6KYQ2|E6KYQ2_9PAST')
+
+# make base tree
+tree_raxml_visual <- ggtree(tree_raxml)
+
+tree_raxml_visual <- tree_raxml_visual%<+%df_meta+
+  geom_nodelab(aes(label=node),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_tiplab(aes(label=gene_name), size=3, align=TRUE)+
+  geom_treescale(x=3.5, color=NA)
+
+tree_raxml_visual
+
+```
+
+One thing to note about `facet_plot()` is that it requires the first column of the dataframe it is associated with to have the same values as the tree's `tip.label` AND be in the same order as they appear in the tree! 
+
+We will make a single-use dataframe, `df_tree_order`, to get the `tip.label` from the tree in the correct order and then `merge()` it with our metadata dataframe, `df_meta`. We then subset that dataframe to make a new dataframe called `df_meta_tree`
+
+```{r}
+
+# make a dataframe of the tree tip labels and their order of appearance
+df_tree_order <- data.frame('tip_label'=tree_raxml$tip.label,
+                            'order'=seq(1:length(tree_raxml$tip.label)))
+
+# merge with the metadata table
+df_tree_order <- merge(df_tree_order,df_meta, by.x='tip_label', by.y='gene_id')
+
+# make a dataframe consisting of the tip label and valariable of interest
+df_meta_tree <- data.frame('tip_label'=df_tree_order$tip_label,
+                           'tcs'=df_tree_order$triclosan_tolerance)
+
+
+# plot
+facet_plot(tree_raxml_visual, data=df_meta_tree,
+           geom=geom_barh,
+           mapping = aes(x = tcs),
+           stat='identity',
+           panel='triclosan tolerance'
+           )
+
+```
+
+We can make some small adustments using ggplot annotation layers so that the visual is more informative.
+
+```{r}
+facet_plot(tree_raxml_visual, data=df_meta_tree,
+           geom=geom_barh,
+           mapping = aes(x = tcs),
+           stat='identity',
+           panel='triclosan tolerance'
+           )+
+  theme_classic2()+
+  theme(strip.background = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+
+```
+
+
+[There are many more ways to work with tree and bar plot/boxplot data!](https://guangchuangyu.github.io/2016/10/facet_plot-a-general-solution-to-associate-data-with-phylogenetic-tree/)
+
+Thank you for comign to Day 3! 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

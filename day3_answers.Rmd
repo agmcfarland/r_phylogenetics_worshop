@@ -1,0 +1,79 @@
+---
+title: "day3_answers"
+author: "Alex McFarland"
+date: "8/13/2021"
+output: html_document
+---
+
+
+```{r setup}
+
+#install.packages('ggtree')
+#install.packages('ggplot2')
+#install.packages('dplyr')
+#install.packages('treeio')
+#install.packages('phytools')
+#install.packages('ape')
+#install.packages('ggpubr')
+#install.packages('ggnewscale')
+
+library(ggtree)
+library(ggplot2)
+library(dplyr)
+library(treeio)
+library(phytools)
+library(ape)
+library(ggpubr)
+library(ggnewscale)
+library(ggstance)
+
+setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_workshop/r_phylogenetics_worshop') # change this to your R Markdown's file path
+
+```
+
+---
+
+### Exercise 1
+
+Edit the above visualization so that the node pies are a different color, gene names are used, and a zoomed in visualization is provided.
+
+1. Associate `df_meta` with `base_tree` using the `%<+%` operator. Set the `geom_tiplab()` `aes(label=gene_name)`
+
+```{r}
+
+tree_vis_ex <- base_tree%<+%df_meta+
+  geom_inset(pies,width=.1, height=.1)+
+  geom_tiplab(size=2.6,align = TRUE,offset=.05, aes(label=gene_name))+
+  geom_treescale(x=3, color=NA)
+
+tree_vis_ex
+
+```
+
+2. Use the `lapply()` function to changethe color of the pie chart to `'orange'` and `'blue'`. 
+
+Add the new `pies2` to `geom_inset()`
+
+```{r}
+
+pies <- nodepie(df_ancstats,cols=c('high','low'),alpha=0.8)
+pies2 <- lapply(pies, function(g) g + scale_fill_manual(values = c('orange','blue')))
+
+tree_vis_ex2 <- base_tree%<+%df_meta+
+  geom_inset(pies2,width=.1, height=.1)+
+  geom_tiplab(size=2.6,align = TRUE,offset=.05, aes(label=gene_name))+
+  geom_treescale(x=3, color=NA)
+
+tree_vis_ex2
+
+```
+
+3. Use `viewClade()` to zoom in on `node=25` and store in `zoom_in_vis`. After, use `ggpubr::ggarrange()` view `tree_vis_ex2` and `zoom_in_vis` side by side.
+
+```{r}
+
+zoom_in_vis <- viewClade(tree_vis_ex2, node=25)
+
+ggpubr::ggarrange(tree_vis_ex2, zoom_in_vis)
+
+```
