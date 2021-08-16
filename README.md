@@ -2,6 +2,12 @@
 
 In this workshop you will learn how to work with phylogenetic trees programatically using R, particularly using the package [ggtree](https://yulab-smu.top/treedata-book/index.html)
 
+
+---
+
+<img src="images/multitree.png" alt="tree with heatmaps" width=1000>
+
+
 ## Workshop overview
 
 
@@ -69,6 +75,8 @@ The metadata used throughout the workshop for reference.
 Special thanks to [Colby Witherup Wood](https://github.com/aGitHasNoName) for their assistance
 
 G Yu. Using ggtree to visualize data on tree-like structures. Current Protocols in Bioinformatics, 2020, 69:e96. doi: 10.1002/cpbi.96.
+
+Paradis E, Schliep K (2019). “ape 5.0: an environment for modern phylogenetics and evolutionary analyses in R.” Bioinformatics, 35, 526-528.
 
 G Yu*, TTY Lam, H Zhu, Y Guan*. Two methods for mapping and visualizing associated data on phylogeny using ggtree. Molecular Biology and Evolution, 2018, 35(2):3041-3043. doi: 10.1093/molbev/msy194.
 
