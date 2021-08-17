@@ -34,10 +34,6 @@ setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_w
 ```
 
 
-- Section 1: Using metadata to subset and highlight features of a tree
-
-- Section 2: Plot trees alongside heatmaps
-
 
 ### Section 1: Using metadata to subset and highlight features of a tree 
 

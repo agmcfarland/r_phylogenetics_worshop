@@ -125,9 +125,9 @@ ggtree(___)+
 
 ```{r eval=FALSE, include=FALSE}
 
-ggtree(my_nwk)+
+___(my_nwk)+
   geom_tiplab()+ # show tip labels
-  geom_treescale(x=7) # recenter the tree
+  ___(___) # recenter the tree
   
 ```
 

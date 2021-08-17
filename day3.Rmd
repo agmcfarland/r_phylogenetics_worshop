@@ -366,7 +366,7 @@ facet_plot(tree_raxml_visual, data=df_meta_tree,
 
 [There are many more ways to work with tree and bar plot/boxplot data!](https://guangchuangyu.github.io/2016/10/facet_plot-a-general-solution-to-associate-data-with-phylogenetic-tree/)
 
-Thank you for comign to Day 3! 
+Thank you for coming to Day 3! 
 
 
 
