@@ -45,9 +45,24 @@ Each day has a knitted R Markdown .html file that can be used as a reference. Ex
 
 ## Running workshop code
 
+There are a couple of ways to run this workshop.
+
+### Option 1 (local):
+
 Click on the green Code button and choose Download Zip, unzip the folder on your computer, open the appropriate R Markdown file. 
 
 Please make sure that you have all packages installed! The `install.packages()` command for each package is included in the first code cell of each R Markdown file.
+
+### Option 2 (cloud):
+
+[Click here to run a version of this workshop through your browser using **binder**](https://mybinder.org/v2/gh/fomightez/r_phylogenetics_worshop/main?urlpath=rstudio)
+
+**Many thanks to Wayne ([@Fomightez](https://twitter.com/Fomightez)) for putting this together!**
+
+[Repo fork for binder version](https://github.com/fomightez/r_phylogenetics_worshop)
+
+[Check out Wayne's bioinformatics portal containg other useful bioinformatics tools and pipelines here!](http://fomightez.github.io/)
+
 
 
 ## Parts of a tree
@@ -73,6 +88,8 @@ The metadata used throughout the workshop for reference.
 [Northwestern University Information Technology Research Computing Services](https://github.com/nuitrcs)
 
 Special thanks to [Colby Witherup Wood](https://github.com/aGitHasNoName) for their assistance
+
+Many thanks to [Wayne Decatur](https://github.com/fomightez) for adapting the code for binder
 
 G Yu. Using ggtree to visualize data on tree-like structures. Current Protocols in Bioinformatics, 2020, 69:e96. doi: 10.1002/cpbi.96.
 
