@@ -5,7 +5,7 @@ date: "8/12/2021"
 output: html_document
 ---
 
-Section 1: Adding ancestral reconstruction state data to trees
+Section 1: Adding ancestral state reconstruction data to trees
 
 Section 2: Comparing and visualizing different tree topologies
 
@@ -38,7 +38,7 @@ setwd('/Users/owlex/Dropbox/Documents/Northwestern/rcs_consult/r_phylogenetics_w
 
 ```
 
-### Section 1: Adding ancestral reconstruction state data to trees
+### Section 1: Adding ancestral state reconstruction data to trees
 
 Ancestral state reconstruction is a useful method that assess the likelihood of a specific trait occurring given a phylogeny. 
 

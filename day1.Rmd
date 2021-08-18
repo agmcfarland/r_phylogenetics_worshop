@@ -35,6 +35,8 @@ We will learn about reading and plotting trees using a set of 20 genes that belo
 
 For your own interpretation, know that FabV, FabK, and FabI have the same enzymatic function, but fabG does not. Despite the overlap in function, fabG and FabI are more closely related to each other by sequence. FabV is the next most closely related, and fabK is the least related.
 
+Throughout the workshop, I highlight when I'm using non-ggtree packages by calling on the package name first and then the function. For example using the `ape` package's function `read`, I call on it by typing `ape::read()`. Hopefully this makes the roles of the different packages being used more obvious and how they fit together more clear.
+
 ## Section 1:  Reading in different phylogenetic tree file types
 
 There are a variety of different phylogenetic tree file types. One of the most popular ones is the `.newick` (also abbreviated `.nwk`)
@@ -625,7 +627,7 @@ tree_raxml_outgrouproot <- ape::root(tree_raxml ,outgroup='tr|E6KYQ2|E6KYQ2_9PAS
 
 tree_raxml_outgrouproot$node.label[as.numeric(tree_raxml_outgrouproot$node.label)<50] <- '' # make bootstrap values less than 50 an empty character
 
-tree_raxml_outgrouproot$node.label[as.character(tree_raxml_outgrouproot$node.label)=='Root'] <- '' #make the word `Root` and empty character
+tree_raxml_outgrouproot$node.label[as.character(tree_raxml_outgrouproot$node.label)=='Root'] <- '' #make the word `Root` an empty character
 
 ```
 

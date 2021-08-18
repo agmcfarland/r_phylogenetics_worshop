@@ -27,7 +27,7 @@ In this workshop you will learn how to work with phylogenetic trees programatica
 
 ### Day 3: Incorporating trees with quantitative data
 
-- Adding ancestral reconstruction state data to trees
+- Adding ancestral state reconstruction data to trees
 
 - Comparing and visualizing different tree topologies
 

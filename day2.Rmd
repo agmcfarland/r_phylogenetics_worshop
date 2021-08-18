@@ -141,8 +141,6 @@ Set the `outgroup` to `'tr|E6KYQ2|E6KYQ2_9PAST'` using `ape::root()`. Store in t
 Make a base tree called `tree_raxml_ex_visual` using `ggtree()` from the `tree_raxml_ex` tree object. 
 
 
-
-
 ```{r eval=FALSE, include=FALSE}
 tree_raxml_ex <- ape::___('RAxML_bipartitions.raw_enoyl_seqs')
 
