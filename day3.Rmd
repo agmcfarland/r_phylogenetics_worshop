@@ -282,7 +282,7 @@ Note: we do not root the tree here because the 100 bootstraps are not rooted eit
 tree_raxml1 <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
 
 tree_raxml_best <- ggtree(tree_raxml1)+
-  geom_nodelab(aes(label=node),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
+  geom_nodelab(aes(label=label),nudge_x=-.15,nudge_y=.4,size=2,color='blue')+
   geom_tiplab(size=3)+
   xlim(0,10)
 

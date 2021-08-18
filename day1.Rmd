@@ -146,7 +146,7 @@ tree_raxml$node.label
 
 ```
 
-The bootstrap values can be displayed "out of the box" on the tree using the option `geom_nodelabaes(label=label)`
+**The bootstrap values can be displayed "out of the box" on the tree using the option `geom_nodelabaes(label=label)`**
 
 ```{r}
 
@@ -468,6 +468,8 @@ In each ggtree object there exist a list of node numbers. These numbers are diff
 
 We can list ALL node numbers (including those that belong to leaves) on the tree using `geom_text2()`
 
+**Importantly, we display the values by using `aes(label=node)`**
+
 ```{r}
 
 ggtree(tree_raxml_outgrouproot_compare)+
@@ -475,8 +477,9 @@ ggtree(tree_raxml_outgrouproot_compare)+
 
 ```
 
-This gives us all node numbers. But we really only want those that are at actual nodes at each branching and not those that are on the leaves.
+This gives us all node numbers. But we really only want those that are at actual nodes at each branching and not those that are on the leaves. To do so, we use `geom_nodelab()`.
 
+**Again, we show node values by using `aes(label=node)`**
 
 ```{r}
 
