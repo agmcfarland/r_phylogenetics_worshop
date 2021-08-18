@@ -22,6 +22,7 @@ Section 3: Plotting trees with bar plots
 #install.packages('ape')
 #install.packages('ggpubr')
 #install.packages('ggnewscale')
+#install.packages('ggstance')
 
 library(ggtree)
 library(ggplot2)
