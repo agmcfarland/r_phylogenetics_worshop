@@ -81,6 +81,8 @@ The metadata used throughout the workshop for reference.
 ---
 
 
+** If you liked this workshop, consider taking a look at my [Biopython workshop!](https://github.com/agmcfarland/biopython_workshop)
+
 
 ## Acknowledgements and references 
 
