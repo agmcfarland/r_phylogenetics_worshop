@@ -86,6 +86,7 @@ The metadata used throughout the workshop for reference.
 
 ## Acknowledgements and references 
 
+Please follow me on twitter! [@https://twitter.com/alexmcfarland_]
 
 [Northwestern University Information Technology Research Computing Services](https://github.com/nuitrcs)
 
