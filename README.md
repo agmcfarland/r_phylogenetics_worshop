@@ -18,7 +18,7 @@ In this workshop you will learn how to work with phylogenetic trees programatica
 - Plotting trees
 
 
-### Day 2: Neatly associating trees with complimentary data
+### Day 2: Neatly associating trees with complementary data
 
 - Using metadata to subset and highlight features of a tree 
 
