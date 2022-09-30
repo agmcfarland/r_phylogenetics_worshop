@@ -10,13 +10,14 @@ output: html_document
 
 ```{r setup}
 
-#install.packages('ggtree')
-#install.packages('ggplot2')
-#install.packages('dplyr')
-#install.packages('treeio')
-#install.packages('phytools')
-#install.packages('ape')
-#install.packages('ggpubr')
+# install.packages("BiocManager")
+# BiocManager::install("ggtree")
+# install.packages('ggplot2')
+# install.packages('dplyr')
+# install.packages('treeio')
+# install.packages('phytools')
+# install.packages('ape')
+# install.packages('ggpubr')
 
 library(ggtree)
 library(ggplot2)
@@ -44,7 +45,7 @@ There are a variety of different phylogenetic tree file types. One of the most p
 We can read in the file using `ape`'s `read.newick()` function.
 
 
-```{r}
+```{r warning=FALSE}
 
 tree_nwk <- ape::read.tree('raw_enoyl_seqs.nwk')
 
@@ -52,7 +53,7 @@ tree_nwk <- ape::read.tree('raw_enoyl_seqs.nwk')
 
 `tree_nwk` is of `class` '`phylo`'. When can always confirm this by using the `class()` function.
 
-```{r}
+```{r warning=FALSE}
 
 class(tree_nwk)
 
@@ -60,7 +61,7 @@ class(tree_nwk)
 
 We can access the information about the tree object
 
-```{r}
+```{r warning=FALSE}
 
 # general info
 tree_nwk
@@ -72,7 +73,7 @@ tree_nwk$tip.label
 
 The `ggtree` package makes it very easy to quickly read in a .`newick` file and view a nicely formatted phylogenetic tree. 
 
-```{r}
+```{r warning=FALSE}
 
 tree_nwk <- ape::read.tree('raw_enoyl_seqs.nwk')
 ggtree(tree_nwk)+ # read in tree
@@ -137,7 +138,7 @@ ___(my_nwk)+
 
 Some file types hold additional information. For example, the RAxML tree files can contain bootstrap values at each node bifurcation.
 
-```{r}
+```{r warning=FALSE}
 tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
 class(tree_raxml)
 
@@ -148,7 +149,7 @@ tree_raxml$node.label
 
 **The bootstrap values can be displayed "out of the box" on the tree using the option `geom_nodelabaes(label=label)`**
 
-```{r}
+```{r warning=FALSE}
 
 ggtree(tree_raxml)+
   geom_tiplab()+
@@ -162,7 +163,7 @@ Oftentimes we want to re-order the tree according to a phylogenetic rooting.
 The `phytools` package provides a `midpoint.root()`ing function for re-ordering the tip labels so that the root is at the two longest branchest.
 
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml_midpointroot <- phytools::midpoint.root(tree_raxml)
 
@@ -171,7 +172,7 @@ tree_raxml_midpointroot <- phytools::midpoint.root(tree_raxml)
 We can compare the order of the original tree vs the midpoint by accessing data stored in the tree object
 
 
-```{r}
+```{r warning=FALSE}
 
 compare_tips <- data.frame('original'=tree_raxml$tip.label, 
                            'midpoint'=tree_raxml_midpointroot$tip.label)
@@ -181,7 +182,7 @@ compare_tips
 
 We can also compare them by plotting both trees side by side
 
-```{r}
+```{r warning=FALSE}
 # tree 1
 
 tree_original_visual <- ggtree(tree_raxml)+
@@ -206,7 +207,7 @@ Another option to re-organize the tree is to root the tree to an ancestral gene 
 
 We will try this by using `ape::root()` on the gene `sp|P24182|ACCC_ECOLI` and `tr|E6KYQ2|E6KYQ2_9PAST`
 
-```{r}
+```{r warning=FALSE}
 
 # first outgroup tree
 tree_raxml_outgrouproot <- ape::root(tree_raxml ,outgroup='sp|P24182|ACCC_ECOLI')
@@ -272,7 +273,7 @@ We will now go over a variety of them below.
 
 First we will make a tree for a base comparison
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
 
@@ -283,12 +284,14 @@ tree_raxml_outgrouproot_visual <- ggtree(tree_raxml_outgrouproot_compare)+
   geom_nodelab(aes(label=label))+
   geom_treescale(x=5)
 
+tree_raxml_outgrouproot_visual
+
 ```
 
 
 Making tip labels smaller, making bootstrap values smaller and moving them a bit so they over lap less
 
-```{r}
+```{r warning=FALSE}
 
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
   geom_tiplab(size=2)+
@@ -301,7 +304,8 @@ ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
 
 Adding tip points and offsetting the tip labels to accomodate them
 
-```{r}
+```{r warning=FALSE}
+
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
   geom_tiplab(size=2,offset=0.1)+
   geom_tippoint()+
@@ -316,7 +320,7 @@ ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
 Convert the tree into a cladogram
 
 
-```{r}
+```{r warning=FALSE}
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare, branch.length = 'none')+
   geom_tiplab(size=2,offset=0.3)+
   geom_tippoint()+
@@ -331,7 +335,7 @@ ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
 Have all tip labels be right-justified 
 
 
-```{r}
+```{r warning=FALSE}
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
   geom_tiplab(size=2,align = TRUE,offset=.3)+
   geom_tippoint()+
@@ -345,7 +349,7 @@ ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
 Cladogram, circular tree 
 
 
-```{r}
+```{r warning=FALSE}
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare, layout='circular',branch.length = 'none')+
   geom_tiplab(size=2,offset=.01)+
   geom_tippoint()+
@@ -360,7 +364,7 @@ ggpubr::ggarrange(tree_raxml_outgrouproot_visual,tree_compare,nrow=1)
 Circular tree with branch lengths, all tips aligned to the same branch length
 
 
-```{r}
+```{r warning=FALSE}
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare, layout='circular')+
   geom_tiplab(size=2,align=TRUE,offset=.01)+
   geom_tippoint()+
@@ -451,7 +455,7 @@ One last thing we'll touch on are zooming in on specific areas of the tree and c
 
 The nodes of each tree can be visualized
 
-```{r}
+```{r warning=FALSE}
 
 tree_compare <- ggtree(tree_raxml_outgrouproot_compare)+
   geom_tiplab(size=2,align=TRUE,offset=.01)+
@@ -470,7 +474,7 @@ We can list ALL node numbers (including those that belong to leaves) on the tree
 
 **Importantly, we display the values by using `aes(label=node)`**
 
-```{r}
+```{r warning=FALSE}
 
 ggtree(tree_raxml_outgrouproot_compare)+
   geom_text2(aes(label=node), hjust=-.3,size=3)
@@ -481,7 +485,7 @@ This gives us all node numbers. But we really only want those that are at actual
 
 **Again, we show node values by using `aes(label=node)`**
 
-```{r}
+```{r warning=FALSE}
 
 ggtree(tree_raxml_outgrouproot_compare)+
   geom_nodelab(aes(label=node),hjust=-.3,size=3,color='blue')+
@@ -493,7 +497,7 @@ ggtree(tree_raxml_outgrouproot_compare)+
 Knowing these node values is useful because now we can use this information to subset the tree and zoom in on a specific portion of it.
 
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml_outgrouproot_visual <- ggtree(tree_raxml_outgrouproot_compare)+
   geom_nodelab(aes(label=node),hjust=-.3,size=3,color='blue')+
@@ -508,7 +512,7 @@ ggpubr::ggarrange(tree_raxml_outgrouproot_visual,zoomin_visual)
 
 If we know the structure of the tree, and its nodes, we can clean up the code so that we show bootstraps instead of internal node numbers.
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml_outgrouproot_visual <- ggtree(tree_raxml_outgrouproot_compare)+
     geom_nodelab(aes(label=label),nudge_x=-.15,nudge_y=.4,size=2)+
@@ -558,7 +562,7 @@ zoomin_visual1
 
 Branches can be `collapse()`'d at specified nodes. The node can be marked with `geom_point2()` to more clearly indicate the branch was collapsed.
 
-```{r}
+```{r warning=FALSE}
 
 # collapse, no marker
 tree_raxml_outgrouproot_visual2 <- collapse(tree_raxml_outgrouproot_visual, node=36)
@@ -584,7 +588,7 @@ tree_raxml_outgrouproot_visual3
 
 Nodes can be collapsed but still show the extent of the phylogenetic diversity that they capture
 
-```{r}
+```{r warning=FALSE}
 
 collapse(tree_raxml_outgrouproot_visual, node=36, 'max')
 
@@ -598,7 +602,7 @@ collapse(tree_raxml_outgrouproot_visual, node=36, 'mixed')
 
 Branches can be highlighted using `geom_highight()` 
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml_outgrouproot_visual4 <- tree_raxml_outgrouproot_visual+
   geom_highlight(35, 'lightblue')
@@ -611,7 +615,7 @@ tree_raxml_outgrouproot_visual4
 Branches and clades can be annotated using `geom_cladelabel()`
 
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml_outgrouproot_visual+
   geom_cladelabel(node=35, label='fabG', align=TRUE,offset = 2, angle=90, vjust=2, hjust=0.5)
@@ -622,7 +626,7 @@ tree_raxml_outgrouproot_visual+
 One last thing we might want to do is not display any bootstrap value less than 50. This requires altering the tree itself, not the tree visualization object.
 
 
-```{r}
+```{r warning=FALSE}
 
 tree_raxml <- ape::read.tree('RAxML_bipartitions.raw_enoyl_seqs')
 
@@ -644,8 +648,7 @@ We also want to highlight that fabG has some variation but that one fabG, which 
 Putting it all together.
 
 
-```{r}
-
+```{r warning=FALSE}
 
 tree_raxml_outgrouproot_visual6 <- ggtree(tree_raxml_outgrouproot)+
   geom_tiplab(size=2,offset=0.1)+
@@ -656,7 +659,7 @@ tree_raxml_outgrouproot_visual6 <- ggtree(tree_raxml_outgrouproot)+
 tree_raxml_outgrouproot_visual6 <- collapse(tree_raxml_outgrouproot_visual6, node=24,'max')
 
 tree_raxml_outgrouproot_visual6 <- tree_raxml_outgrouproot_visual6+
-  geom_highlight(35, 'lightblue')+
+  geom_highlight(node=35, 'lightblue')+
   geom_cladelabel(node=35, label='fabG', align=TRUE,offset = 1.2, angle=90, vjust=2, hjust=0.5)+
   geom_cladelabel(node=24, label='fabV', align=TRUE,offset = -.2, angle=90, vjust=2, hjust=0.5)+
   geom_cladelabel(node=2, label='novel\nfabG', align=TRUE,offset = 1.1, angle=90, vjust=2, hjust=0.5, color='blue')
