@@ -67,7 +67,7 @@ Please make sure that you have all packages installed! The `install.packages()` 
 
 ## Parts of a tree
 
-Here are some useful terms to know when working with trees. The `ggtree()` equiavalents are highlighted in maroon.
+Here are some useful terms to know when working with trees. The `ggtree()` equivalents are highlighted in maroon.
 
 <img src="images/tree_parts.png" alt="different terms used to describe a tree" width=1000>
 
